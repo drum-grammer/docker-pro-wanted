@@ -48,7 +48,7 @@ cd my-name
 ```
 2. "Hello, World!"를 출력하는 도커 파일을 만듭니다.
 ```shell
-vim Dockefile
+vim Dockerfile
 ```
 `i`를 눌러 편집모드로 전환 후 아래 내용을 작성합니다:
 ```Dockerfile
