@@ -33,20 +33,21 @@ git push -u origin my-branch-xx
 
 ## III. 도커 설치부터 실행 튜토리얼
 ### 도커 설치
-1. 도커 공식 웹사이트에서 "[Get Started](https://www.docker.com/get-started)"를 클릭합니다. 
-2. OS에 맞는 설치 파일을 다운로드 받습니다.
+#### 1. 도커 공식 웹사이트에서 "[Get Started](https://www.docker.com/get-started)"를 클릭합니다. 
+#### 2. OS에 맞는 설치 파일을 다운로드 받습니다.
 - MacOS의 경우 "Download for Mac"을 클릭합니다.
 - Window 일 경우 "Download for Windows"를 클릭합니다. 
 - 다운로드한 설치 파일을 실행합니다.
 
 ### 도커 컨테이너 실행 시키기
-1. `나의 사전 미션 폴더`를 만들고 해당 폴더로 이동합니다.
+#### 1. `나의 사전 미션 폴더`를 만들고 해당 폴더로 이동합니다.
 ```shell
 cd path/to/docker-pro-wanted/mission
 mkdir my-name
 cd my-name
 ```
-2. "Hello, World!"를 출력하는 도커 파일을 만듭니다.
+
+#### 2. "Hello, World!"를 출력하는 도커 파일을 만듭니다.
 ```shell
 vim Dockefile
 ```
@@ -56,12 +57,14 @@ FROM alpine:latest
 CMD ["echo", "Hello, World"]
 ```
 `ESC`를 눌러 명령모드로 전환 후, `:wq` 입력, `enter`키를 눌러 `Dockerfile`을 생성합니다.
-3. 도커 파일로 도커 이미지를 빌드합니다.
+
+#### 3. 도커 파일로 도커 이미지를 빌드합니다.
 ```shell
 docker build -t hello-world .
 ```
 (위 명령어의 의미는 "현재 디렉토리에서 `Dockerfile`을 읽어 도커 이미지를 만들고, 해당 이미지에 `hello-world`라는 `tag` 를 붙혀라" 입니다.)
-4. 빌드한 도커 이미지를 실행합니다.
+
+#### 4. 빌드한 도커 이미지를 실행합니다.
 ```shell
 docker run hello-world
 ```
