@@ -13,3 +13,6 @@
 
 ### 4. [실전 미션] 도커 설치하기 (참조: [도커 공식 설치 페이지]
 
+
+![image](https://user-images.githubusercontent.com/110888559/227778856-6c0d952c-88c1-41ae-8528-20502f12dbb9.png)
+
