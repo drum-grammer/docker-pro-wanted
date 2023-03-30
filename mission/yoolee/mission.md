@@ -16,4 +16,4 @@
 ```
 4. [실전 미션] 도커 설치하기
 ---
-![mission screenshot](./yoolee_docker.png)
+![mission screenshot](./mission/yoolee/yoolee_docker.png)
