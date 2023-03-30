@@ -8,4 +8,6 @@
 - 도커 컨테이너 : 도커 이미지로부터 생성된 배포된 인스턴스(Deployed Instances)입니다.
     - `도커 파일 -- (빌드) --> 도커 이미지 -- (생성) --> 도커 컨테이너`
 ### 4. [실전 미션] 도커 설치하기  
-    ![실전 미션](./docker_print_hello_world.png)
+<div>
+    <img src="./docker_print_hello_world.png" width="540px"><br>
+</div>
