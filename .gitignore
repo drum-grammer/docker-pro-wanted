@@ -16,3 +16,9 @@
 
 # Zone.Identifier 파일 거르기
 */Zone.Identifier
+
+# ignore idea settings
+.idea/
+
+# ignore vscode settings
+.vscode/
