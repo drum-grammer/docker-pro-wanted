@@ -51,6 +51,4 @@
 <br><hr>
 
 ### **4. [실전 미션] 도커 설치하기**
-
-
-<br>
+![dockerRun](https://user-images.githubusercontent.com/82142527/229473255-df93e151-0c2f-4f6e-8b14-253ec8391a19.png)
