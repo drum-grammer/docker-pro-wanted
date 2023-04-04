@@ -15,3 +15,4 @@
 4. [실전 미션] 도커 설치하기 (참조: 도커 공식 설치 페이지)
 
 - 아래 도커 설치부터 실행 튜토리얼을 참조하여 도커를 설치하고, 도커 컨테이너를 실행한 화면을 캡쳐해서 Pull Request에 올리세요.
+<img width="570" alt="mission" src="https://user-images.githubusercontent.com/67992684/229764137-b9a77976-d528-4d2f-b55b-b7d5d612cfa1.png">
