@@ -12,5 +12,8 @@
 - 도커파일을 통해 도커 이미지를 생성하고, 도커 이미지를 토대로 도커 컨테이너를 올림
 
 ## 4. [실전 미션] 도커 설치하기
+- Bash<br>
+  ![image](./dockerBash.png)
 - Docker Desktop
   ![image](./dockerDesktop.png)
+
