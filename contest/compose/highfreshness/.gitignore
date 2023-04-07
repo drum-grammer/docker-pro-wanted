@@ -1,0 +1,8 @@
+*__pycache__
+
+model/for-retraining/images
+model/for-retraining/garbages
+
+# 실행하면서 저장되는 이미지들
+client/temp_images
+client/qr_code
