@@ -17,21 +17,21 @@ tomato.py 소스 코드는 [🍅 Tomato Clock](https://github.com/coolcode/tomat
 ### 방법 1
 - Dockerfile로 이미지 빌드
 ```
-docker build --tag {your-docker-hub-namespace}/pomodoro:0.1 .
+docker build --tag {your-docker-hub-namespace}/pomodoro:latest .
 ```
-![img](./img-build.png)
+![img](img-build.png)
 - 컨테이너 실행
 ```
-docker run -it {your-docker-hub-namespace}/pomodoro:0.1
+docker run -it {your-docker-hub-namespace}/pomodoro:latest
 ```
 
 ### 방법 2
 - docker hub에서 이미지 받아오기
 ```
-docker pull drumgrammer/pomodoro:0.1
+docker pull drumgrammer/pomodoro:latest
 ```
 - 컨테이너 실행
 ```
-docker run -it drumgrammer/pomodoro:0.1
+docker run -it drumgrammer/pomodoro:latest
 ```
-![img](./img-execute.png)
+![img](img-execute.png)
