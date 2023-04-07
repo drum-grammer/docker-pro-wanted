@@ -1,0 +1,34 @@
+version: "3.8"
+services:
+  mysql: 
+    image: "mysql"
+    volumes:
+      - data:/data/mysql_db
+    environment:
+      - MYSQL_ROOT_PASSWORD=1234
+      - MYSQL_DATABASE=app 
+    ports:
+      - "3306:3306"
+  ap_server:
+    build: ./app_server
+    restart: always
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./app_server/app:/app/app
+    depends_on:
+      - mysql
+  client_server:
+    build: ./client
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./client:/app
+  inf_server:
+    build: ./model
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./model:/app
+volumes:
+  data:
