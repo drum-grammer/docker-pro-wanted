@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Twitch to Mock RTMP</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!-- hls.js -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        #video {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<h1>Twitch to Mock RTMP</h1>
+<form id="update-form">
+    <label for="twitch-url">Twitch URL:</label>
+    <input type="text" id="twitch-url" name="twitch-url" placeholder="https://www.twitch.tv/CHANNEL_NAME"
+           value="{{ twitch_url }}" required>
+    <br>
+    <input type="submit" value="Update">
+</form>
+<p id="response"></p>
+<h2>Resource Usage</h2>
+<table>
+    <tr>
+        <th></th>
+        <th>CPU (%)</th>
+        <th>RAM (MB)</th>
+    </tr>
+    <tr>
+        <td>Total</td>
+        <td id="cpu_total">0.00</td>
+        <td id="ram_total">0.00</td>
+    </tr>
+    <tr>
+        <td>Streamlink</td>
+        <td id="cpu_streamlink">0.00</td>
+        <td id="ram_streamlink">0.00</td>
+    </tr>
+    <tr>
+        <td>FFmpeg</td>
+        <td id="cpu_ffmpeg">0.00</td>
+        <td id="ram_ffmpeg">0.00</td>
+    </tr>
+</table>
+<div id="resourceUsageChart"></div>
+<a href="{{ url_for('resource_usage_csv') }}" download>Download CSV</a>
+<br>
+<a href="{{ url_for('resource_usage_json') }}" download>Download JSON</a>
+<br>
+<button id="openPlayer" onclick="openVideoPlayer()">Open Video Player</button>
+<button id="hidePlayer" onclick="hideVideoPlayer()">Hide Video Player</button>
+<br>
+<video id="video" controls></video>
+<script>
+    reloadVideoPlayer();
+
+    async function checkM3U8Status(url) {
+        try {
+            const response = await fetch(url, {method: "HEAD"});
+            if (response.status === 404) {
+                return false;
+            } else {
+                return true;
+            }
+        } catch (error) {
+            console.error("Error checking M3U8 status:", error);
+            return false;
+        }
+    }
+
+    async function openVideoPlayer() {
+        const m3u8Url = "/hls/stream.m3u8";
+        const isM3U8Accessible = await checkM3U8Status(m3u8Url);
+
+        const videoPlayer = document.getElementById("video");
+        const messageElement = document.getElementById("response");
+
+        if (isM3U8Accessible) {
+            videoPlayer.style.display = "block";
+            reloadVideoPlayer();
+            videoPlayer.play();
+        } else {
+            videoPlayer.style.display = "none";
+            messageElement.innerText = "M3U8 file is not accessible. Please try again later.";
+        }
+    }
+
+    function hideVideoPlayer() {
+        const videoPlayer = document.getElementById("video");
+        videoPlayer.style.display = "none";
+        videoPlayer.pause();
+    }
+
+    document.getElementById("update-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const twitchUrl = document.getElementById("twitch-url").value;
+        const responseElement = document.getElementById("response");
+        responseElement.textContent = "";
+
+        try {
+            const response = await fetch("/update", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({twitch_url: twitchUrl}),
+            });
+
+            if (response.ok) {
+                responseElement.textContent = "Updated successfully";
+                reloadVideoPlayer();
+            } else {
+                const data = await response.json();
+                responseElement.textContent = `Error: ${data.error}`;
+            }
+        } catch (error) {
+            responseElement.textContent = `Error: ${error.message}`;
+        }
+    });
+
+    function updateChartData(newData) {
+        const timestamp = newData.timestamp;
+        chartData.labels.push(timestamp);
+        chartData.streamlink.cpu.push(newData.streamlink.cpu);
+        chartData.streamlink.ram.push(newData.streamlink.ram);
+        chartData.ffmpeg.cpu.push(newData.ffmpeg.cpu);
+        chartData.ffmpeg.ram.push(newData.ffmpeg.ram);
+        chartData.total.cpu.push(newData.streamlink.cpu + newData.ffmpeg.cpu);
+        chartData.total.ram.push(newData.streamlink.ram + newData.ffmpeg.ram);
+    }
+
+    async function loadChartData() {
+        try {
+            const response = await fetch("/resource_usage_json");
+            const data = await response.json();
+            data.forEach(updateChartData);
+        } catch (error) {
+            console.error("Error loading chart data:", error);
+        }
+    }
+
+    async function fetchData() {
+        try {
+            const response = await fetch("/resource_usage");
+            const data = await response.json();
+            data.total = {};
+            data.total.cpu = data.streamlink.cpu + data.ffmpeg.cpu;
+            data.total.ram = data.streamlink.ram + data.ffmpeg.ram;
+            document.getElementById("cpu_streamlink").innerText = data.streamlink.cpu.toFixed(2);
+            document.getElementById("ram_streamlink").innerText = data.streamlink.ram.toFixed(2);
+            document.getElementById("cpu_ffmpeg").innerText = data.ffmpeg.cpu.toFixed(2);
+            document.getElementById("ram_ffmpeg").innerText = data.ffmpeg.ram.toFixed(2);
+            document.getElementById("cpu_total").innerText = data.total.cpu.toFixed(2);
+            document.getElementById("ram_total").innerText = data.total.ram.toFixed(2);
+            updateChartData(data);
+            Plotly.update("resourceUsageChart", chartData);
+        } catch (error) {
+            console.error("Error fetching resource usage:", error);
+        }
+    }
+
+    let chartData = {
+        labels: [],
+        streamlink: {cpu: [], ram: []},
+        ffmpeg: {cpu: [], ram: []},
+        total: {cpu: [], ram: []},
+    };
+
+    async function initResourceUsageChart() {
+        await loadChartData();
+
+        const traceStreamlinkCpu = {
+            x: chartData.labels,
+            y: chartData.streamlink.cpu,
+            mode: "lines",
+            name: "Streamlink CPU (%)",
+        };
+
+        const traceStreamlinkRam = {
+            x: chartData.labels,
+            y: chartData.streamlink.ram,
+            mode: "lines",
+            name: "Streamlink RAM (MB)",
+            yaxis: "y2",
+        };
+
+        const traceFfmpegCpu = {
+            x: chartData.labels,
+            y: chartData.ffmpeg.cpu,
+            mode: "lines",
+            name: "FFmpeg CPU (%)",
+        };
+
+        const traceFfmpegRam = {
+            x: chartData.labels,
+            y: chartData.ffmpeg.ram,
+            mode: "lines",
+            name: "FFmpeg RAM (MB)",
+            yaxis: "y2",
+        };
+
+        const traceTotalCpu = {
+            x: chartData.labels,
+            y: chartData.total.cpu,
+            mode: "lines",
+            name: "Total CPU (%)",
+        };
+
+        const traceTotalRam = {
+            x: chartData.labels,
+            y: chartData.total.ram,
+            mode: "lines",
+            name: "Total RAM (MB)",
+            yaxis: "y2",
+        };
+
+        const layout = {
+            title: "Resource Usage",
+            xaxis: {title: "Timestamp"},
+            yaxis: {title: "CPU (%)", side: "left"},
+            yaxis2: {title: "RAM (MB)", side: "right", overlaying: "y"},
+        };
+
+        const data = [
+            traceStreamlinkCpu,
+            traceStreamlinkRam,
+            traceFfmpegCpu,
+            traceFfmpegRam,
+            traceTotalCpu,
+            traceTotalRam,
+        ];
+
+        Plotly.newPlot("resourceUsageChart", data, layout);
+    }
+
+    initResourceUsageChart();
+    setInterval(fetchData, 1000);
+
+    function reloadVideoPlayer() {
+        // Get the current location and generate the m3u8 file URL
+        const m3u8Url = "/hls/stream.m3u8";
+
+        if (Hls.isSupported()) {
+            var video = document.getElementById('video');
+            var hls = new Hls();
+            hls.loadSource(m3u8Url);
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, function () {
+                // Add event listener to the video element to handle autoplay policy
+                video.addEventListener('click', function () {
+                    video.play();
+                });
+            });
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = m3u8Url;
+            video.addEventListener('canplay', function () {
+                // Add event listener to the video element to handle autoplay policy
+                video.addEventListener('click', function () {
+                    video.play();
+                });
+            });
+        }
+    }
+
+</script>
+</body>
+</html>
