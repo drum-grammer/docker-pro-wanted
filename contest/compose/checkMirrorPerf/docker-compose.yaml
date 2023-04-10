@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  web_app:
+    build: ./web_app
+    ports:
+      - "5000:5000"
+
+  hls_to_rtmp:
+    build: ./hls_to_rtmp
+
+  mock_rtmp_server:
+    build: ./mock_rtmp_server
+    ports:
+      - "1935:1935"
+      - "8080:80"
