@@ -1,0 +1,69 @@
+version: '3.2'
+
+services:
+  elasticsearch:
+    build:
+      context: "${PWD}/ELK/elasticsearch/"
+      dockerfile: elasticsearch.Dockerfile
+
+    volumes:  # Long Syntax 
+      - type: bind
+        source: "${PWD}/ELK/elasticsearch/config/elasticsearch.yml"
+        target: /usr/share/elasticsearch/config/elasticsearch.yml
+        read_only: true
+      - "${PWD}/ELK/elasticsearch/data:/usr/share/elasticsearch/data"  # data 저장 공간
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+      ELASTIC_PASSWORD: password
+      discovery.type: single-node  # 데모를 위한 싱글 노드 클러스터
+    networks:
+      - elk
+
+  logstash:
+    build:
+      context: "${PWD}/ELK/logstash/"
+      dockerfile: logstash.Dockerfile
+
+    volumes:
+      - type: bind
+        source: "${PWD}/ELK/logstash/config/logstash.yml"
+        target: /usr/share/logstash/config/logstash.yml
+        read_only: true
+      - type: bind
+        source: "${PWD}/ELK/logstash/pipeline"
+        target: /usr/share/logstash/pipeline
+        read_only: true
+    ports:
+      - "5001:5001/tcp"
+      - "5001:5001/udp"
+      - "9600:9600"
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    build:
+      context: ELK/kibana/
+      dockerfile: kibana.Dockerfile
+
+    volumes:
+      - type: bind
+        source: "${PWD}/ELK/kibana/config/kibana.yml"
+        target: /usr/share/kibana/config/kibana.yml
+        read_only: true
+    ports:
+      - "5601:5601"
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+
+networks:
+  elk:
+    driver: bridge
