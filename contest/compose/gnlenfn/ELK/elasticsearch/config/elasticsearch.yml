@@ -1,0 +1,3 @@
+cluster.name: "es-docker-cluster"
+network.host: 0.0.0.0
+
