@@ -1,0 +1,23 @@
+{
+  "name": "todolist-node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/largepine/todolist-node.git"
+  },
+  "author": "largepine",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/largepine/todolist-node/issues"
+  },
+  "homepage": "https://github.com/largepine/todolist-node#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "pug": "^3.0.2"
+  }
+}
